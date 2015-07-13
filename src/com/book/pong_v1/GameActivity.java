@@ -14,7 +14,7 @@ public class GameActivity extends SGActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
+			
 		enableFullScreen();
 		enableKeepScreenOn();
 		
