@@ -1,5 +1,7 @@
 package com.book.pong_v1;
 
+import com.book.simplegameengine_v1.SGImage;
+import com.book.simplegameengine_v1.SGImageFactory;
 import com.book.simplegameengine_v1.SGView;
 
 import android.content.Context;
@@ -7,6 +9,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
+import android.graphics.Rect;
 import android.graphics.RectF;
 
 public class GameView extends SGView {
@@ -27,6 +30,14 @@ public class GameView extends SGView {
 	private RectF mOpponentDestination = new RectF();
 	private RectF mPlayerDestination = new RectF();
 	
+	private SGImage mBallImage;
+	private SGImage mOpponentImage;
+	private SGImage mPlayerImage;
+	
+	private Rect mTempImageSource = new Rect();
+	
+	private static int iteration = 0;
+	
 	public GameView(Context context) {
 		super(context);
 	}
@@ -36,15 +47,52 @@ public class GameView extends SGView {
 		moveBall(elapsedTimeInSeconds);
 		moveOpponent(elapsedTimeInSeconds);
 		mTempPaint.setColor(Color.RED);		
-		canvas.drawRect(mPlayerDestination, mTempPaint);		
-		mTempPaint.setColor(Color.BLACK);
-		// Bola redonda
-		canvas.drawCircle(mBallDestination.centerX(), mBallDestination.centerY(), BALL_SIZE, mTempPaint);
-		//canvas.drawCircle(mBallDestination.exactCenterX(), mBallDestination.exactCenterY(), BALL_SIZE, mTempPaint);
-		// Bola "quadrada"
-		//canvas.drawRect(mBallDestination, mTempPaint);
-		mTempPaint.setColor(Color.BLUE);
-		canvas.drawRect(mOpponentDestination, mTempPaint);
+		
+		mTempImageSource.set(0, 0, PADDLE_WIDTH, PADDLE_HEIGHT);
+		
+		if(mPlayerImage != null) {
+			canvas.drawBitmap(mPlayerImage.getBitmap(), mTempImageSource, mPlayerDestination, mTempPaint);
+		} else {
+			canvas.drawRect(mPlayerDestination, mTempPaint);
+		}
+		if(mOpponentImage != null) {
+			canvas.drawBitmap(mOpponentImage.getBitmap(), mTempImageSource, mOpponentDestination, mTempPaint);
+		} else {
+			canvas.drawRect(mOpponentDestination, mTempPaint);
+		}		
+		mTempImageSource.set(0, 0, BALL_SIZE, BALL_SIZE);
+		if(mBallImage != null) {
+			canvas.drawBitmap(mBallImage.getBitmap(), mTempImageSource, mBallDestination, mTempPaint);
+		} else {
+			canvas.drawRect(mBallDestination, mTempPaint);
+		}
+				
+//		
+//		
+//		
+//		canvas.drawRect(mPlayerDestination, mTempPaint);
+//		if(iteration <= 255) {
+//			mTempPaint.setColor(Color.rgb(iteration, 0, 0));
+//			iteration++;
+//		} else if(iteration <= 511) {
+//			mTempPaint.setColor(Color.rgb(255, iteration - 256, 0));
+//			iteration++;
+//		} else if(iteration <= 767){
+//			mTempPaint.setColor(Color.rgb(255, 255, iteration - 512));
+//			iteration++;
+//		} else {
+//			iteration = 0;
+//		}
+//		
+//		//mTempPaint.setColor(Color.BLACK);
+//		// Bola redonda
+//		canvas.drawCircle(mBallDestination.centerX(), mBallDestination.centerY(), BALL_SIZE, mTempPaint);
+//		
+//		//canvas.drawCircle(mBallDestination.exactCenterX(), mBallDestination.exactCenterY(), BALL_SIZE, mTempPaint);
+//		// Bola "quadrada"
+//		//canvas.drawRect(mBallDestination, mTempPaint);
+//		mTempPaint.setColor(Color.BLUE);
+//		canvas.drawRect(mOpponentDestination, mTempPaint);
 	}
 	
 	@Override
@@ -54,6 +102,12 @@ public class GameView extends SGView {
 		
 		int halfBall = BALL_SIZE / 2;
 		int halfPaddleHeight = PADDLE_HEIGHT / 2;
+		
+		SGImageFactory imageFactory = getImageFactory();
+		
+		mBallImage = imageFactory.createImage(R.drawable.ball);
+		mPlayerImage = imageFactory.createImage("player.png");
+		mOpponentImage = imageFactory.createImage("opponent.png");
 		
 		mBallDestination.set(viewCenter.x - halfBall, // left
 				viewCenter.y - halfBall, // top
@@ -78,17 +132,25 @@ public class GameView extends SGView {
 		if(mBallMoveRight == true) {
 			mBallDestination.left += BALL_SPEED * elapsedTimeInSeconds;
 			mBallDestination.right += BALL_SPEED * elapsedTimeInSeconds;
-			if(mBallDestination.right >= viewDimensisons.x) {
+			mBallDestination.top -= 2;
+			mBallDestination.bottom -= 2;
+			if(mBallDestination.right >= viewDimensisons.x || mBallDestination.top <= 0) {
 				mBallDestination.left = viewDimensisons.x - BALL_SIZE;
+				mBallDestination.top = 0;
 				mBallDestination.right = viewDimensisons.x;
+				mBallDestination.bottom = BALL_SIZE; 
 				mBallMoveRight = false;
 			}
 		} else {
 			mBallDestination.left -= BALL_SPEED * elapsedTimeInSeconds;
 			mBallDestination.right -= BALL_SPEED * elapsedTimeInSeconds;
-			if(mBallDestination.left < 0) {
+			mBallDestination.top += 2;
+			mBallDestination.bottom += 2;
+			if(mBallDestination.left < 0 || mBallDestination.bottom >= viewDimensisons.y) {
 				mBallDestination.left = 0;
+				mBallDestination.top = viewDimensisons.y - BALL_SIZE;
 				mBallDestination.right = BALL_SIZE;
+				mBallDestination.bottom = viewDimensisons.y;
 				mBallMoveRight = true;
 			}
 					
