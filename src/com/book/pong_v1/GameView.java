@@ -2,6 +2,7 @@ package com.book.pong_v1;
 
 import com.book.simplegameengine_v1.SGImage;
 import com.book.simplegameengine_v1.SGImageFactory;
+import com.book.simplegameengine_v1.SGRenderer;
 import com.book.simplegameengine_v1.SGView;
 
 import android.content.Context;
@@ -13,8 +14,6 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 
 public class GameView extends SGView {
-	
-	private Paint mTempPaint = new Paint();
 	
 	private final static int BALL_SIZE = 16;
 	private final static int DISTANCE_FROM_EDGE = 16;
@@ -36,7 +35,7 @@ public class GameView extends SGView {
 	
 	private Rect mTempImageSource = new Rect();
 	
-	private static int iteration = 0;
+	//private static int iteration = 0;
 	
 	public GameView(Context context) {
 		super(context);
@@ -46,30 +45,46 @@ public class GameView extends SGView {
 	public void step(Canvas canvas, float elapsedTimeInSeconds) {
 		moveBall(elapsedTimeInSeconds);
 		moveOpponent(elapsedTimeInSeconds);
-		mTempPaint.setColor(Color.RED);		
+		
+		SGRenderer renderer = getRenderer();
+		renderer.beginDrawing(canvas, Color.BLACK);
+		
+		mTempImageSource.set(0, 0, BALL_SIZE, BALL_SIZE);
+		renderer.drawImage(mBallImage, mTempImageSource, mBallDestination);
 		
 		mTempImageSource.set(0, 0, PADDLE_WIDTH, PADDLE_HEIGHT);
+		renderer.drawImage(mPlayerImage, mTempImageSource, mPlayerDestination);
 		
-		if(mPlayerImage != null) {
-			canvas.drawBitmap(mPlayerImage.getBitmap(), mTempImageSource, mPlayerDestination, mTempPaint);
-		} else {
-			canvas.drawRect(mPlayerDestination, mTempPaint);
-		}
-		if(mOpponentImage != null) {
-			canvas.drawBitmap(mOpponentImage.getBitmap(), mTempImageSource, mOpponentDestination, mTempPaint);
-		} else {
-			canvas.drawRect(mOpponentDestination, mTempPaint);
-		}		
-		mTempImageSource.set(0, 0, BALL_SIZE, BALL_SIZE);
-		if(mBallImage != null) {
-			canvas.drawBitmap(mBallImage.getBitmap(), mTempImageSource, mBallDestination, mTempPaint);
-		} else {
-			canvas.drawRect(mBallDestination, mTempPaint);
-		}
-				
+		mTempImageSource.set(0, 0, PADDLE_WIDTH, PADDLE_HEIGHT);
+		renderer.drawImage(mOpponentImage, mTempImageSource, mOpponentDestination);
+		
+		renderer.endDrawing();
+		
+//		mTempPaint.setColor(Color.RED);		
 //		
+//		mTempImageSource.set(0, 0, PADDLE_WIDTH, PADDLE_HEIGHT);
 //		
-//		
+//		if(mPlayerImage != null) {
+//			canvas.drawBitmap(mPlayerImage.getBitmap(), mTempImageSource, mPlayerDestination, mTempPaint);
+//		} else {
+//			canvas.drawRect(mPlayerDestination, mTempPaint);
+//		}
+//		if(mOpponentImage != null) {
+//			canvas.drawBitmap(mOpponentImage.getBitmap(), mTempImageSource, mOpponentDestination, mTempPaint);
+//		} else {
+//			canvas.drawRect(mOpponentDestination, mTempPaint);
+//		}		
+//		mTempImageSource.set(0, 0, BALL_SIZE, BALL_SIZE);
+//		if(mBallImage != null) {
+//			canvas.drawBitmap(mBallImage.getBitmap(), mTempImageSource, mBallDestination, mTempPaint);
+//		} else {
+//			canvas.drawRect(mBallDestination, mTempPaint);
+//		}
+//
+		
+		
+		
+		
 //		canvas.drawRect(mPlayerDestination, mTempPaint);
 //		if(iteration <= 255) {
 //			mTempPaint.setColor(Color.rgb(iteration, 0, 0));
