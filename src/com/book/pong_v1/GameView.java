@@ -196,5 +196,24 @@ public class GameView extends SGView {
 		}
 		
 	}
+	
+	private static final int MULTIPLIER = 1;
+	
+	public void movePlayer(float x, float y, boolean relative) {
+		Point viewDimensions = getDimensions();
+		mPlayerDestination.top += y * MULTIPLIER;
+		mPlayerDestination.bottom += y * MULTIPLIER;
+		
+		if(relative) {
+			if(mPlayerDestination.top < 0) {
+				mPlayerDestination.top = 0;
+				mPlayerDestination.bottom = PADDLE_HEIGHT;
+			}
+			else if(mPlayerDestination.bottom > viewDimensions.y) {
+				mPlayerDestination.top = viewDimensions.y - PADDLE_HEIGHT;
+				mPlayerDestination.bottom = viewDimensions.y;
+			}
+		}
+	}
 
 }
